@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Malia">
+<meta name="theme-color" content="#f0faf4">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.svg">
+<title>Malia — Finance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#f0faf4;--bg2:#e3f5eb;--bg3:#d4edd e;
+  --g1:#155e34;--g2:#1a7a42;--g3:#22a058;--g4:#2dc96e;--g5:#52d988;
+  --card:#ffffff;--card2:#f5fcf7;
+  --b1:rgba(34,160,88,0.13);--b2:rgba(34,160,88,0.24);--b3:rgba(34,160,88,0.4);
+  --t1:#0d2418;--t2:#2a5e3d;--t3:#5a9e74;--t4:#a0c8ae;
+  --red:#dc2626;--redb:rgba(220,38,38,0.09);--redb2:rgba(220,38,38,0.16);
+  --amber:#b45309;--amberb:rgba(180,83,9,0.1);
+  --blue:#1d4ed8;--blueb:rgba(29,78,216,0.1);
+  --purple:#7c3aed;--purpleb:rgba(124,58,237,0.1);
+  --r8:8px;--r12:12px;--r14:14px;--r16:16px;--r20:20px;--r24:24px;--rpill:999px;
+  --shadow:0 1px 3px rgba(0,0,0,0.07),0 4px 16px rgba(0,0,0,0.04);
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Nunito',sans-serif;color:var(--t1);}
+#shell{display:flex;flex-direction:column;height:100%;max-width:430px;margin:0 auto;position:relative;}
+#pages{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scroll-behavior:smooth;padding-bottom:calc(72px + env(safe-area-inset-bottom,0px));}
+#pages::-webkit-scrollbar{display:none;}
+.page{display:none;animation:fadeUp .2s ease;}
+.page.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* TOPBAR */
+.topbar{padding:calc(env(safe-area-inset-top,0px) + 18px) 18px 12px;display:flex;justify-content:space-between;align-items:center;}
+.tb-left .eyebrow{font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.6px;text-transform:uppercase;}
+.tb-left .headline{font-size:23px;font-weight:900;color:var(--t1);letter-spacing:-.6px;margin-top:1px;}
+.tb-right{display:flex;gap:8px;}
+.ico-btn{width:40px;height:40px;border-radius:var(--r12);background:var(--card);border:1.5px solid var(--b1);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);font-size:18px;box-shadow:var(--shadow);transition:all .14s;}
+.ico-btn:active{transform:scale(.9);background:var(--bg2);}
+.ico-btn.spin{animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ico-btn.green{background:#e6faf0;border-color:#a3e9c1;color:var(--g2);}
+.ico-btn.red-state{background:#fff0f0;border-color:#fca5a5;color:var(--red);}
+
+/* HERO */
+.hero{margin:0 16px 16px;background:var(--g2);border-radius:var(--r24);padding:22px 22px 20px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.06);}
+.hero::after{content:'';position:absolute;bottom:-60px;right:20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.04);}
+.hero-lbl{font-size:11px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;}
+.hero-amt{font-size:38px;font-weight:300;color:#fff;letter-spacing:-2px;font-family:'JetBrains Mono',monospace;line-height:1;position:relative;z-index:1;}
+.hero-amt .cur{font-size:16px;font-weight:500;font-family:'Nunito',sans-serif;opacity:.7;vertical-align:top;margin-top:7px;display:inline-block;margin-right:2px;}
+.hero-hint{font-size:12px;font-weight:600;color:rgba(255,255,255,.4);margin-top:5px;position:relative;z-index:1;}
+.hero-chips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:18px;position:relative;z-index:1;}
+.hchip{background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.14);border-radius:var(--r14);padding:11px 13px;display:flex;align-items:center;gap:9px;}
+.hchip-ico{width:28px;height:28px;border-radius:var(--r8);background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;color:#fff;}
+.hchip-lbl{font-size:10px;color:rgba(255,255,255,.5);font-weight:700;letter-spacing:.3px;}
+.hchip-val{font-size:14px;font-weight:700;color:#fff;font-family:'JetBrains Mono',monospace;}
+
+/* INSIGHT */
+.insight{margin:0 16px 14px;background:var(--card);border:1.5px solid var(--b1);border-radius:var(--r16);padding:13px 15px;display:flex;gap:10px;box-shadow:var(--shadow);}
+.insight-ico{font-size:18px;flex-shrink:0;margin-top:1px;}
+.insight-txt{font-size:13px;color:var(--t2);line-height:1.55;font-weight:600;}
+.insight-txt strong{color:var(--g2);}
+.insight.warn .insight-txt strong{color:var(--red);}
+
+/* SECTION HEADER */
+.sh{display:flex;justify-content:space-between;align-items:center;padding:0 18px;margin-bottom:10px;}
+.sh h2{font-size:11px;font-weight:800;color:var(--t3);letter-spacing:.7px;text-transform:uppercase;}
+.sh a{font-size:12px;font-weight:700;color:var(--g2);cursor:pointer;}
+
+/* QUICK ACTIONS */
+.qa-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:0 16px;margin-bottom:20px;}
+.qa{background:var(--card);border:1.5px solid var(--b1);border-radius:var(--r20);padding:14px 14px 14px 13px;display:flex;align-items:center;gap:12px;cursor:pointer;box-shadow:var(--shadow);transition:all .14s;}
+.qa:active{transform:scale(.96);}
+.qa-ico{width:42px;height:42px;border-radius:var(--r12);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.qa-t{font-size:13px;font-weight:800;color:var(--t1);}
+.qa-s{font-size:11px;color:var(--t3);margin-top:1px;font-weight:600;}
+
+/* CARD */
+.card{background:var(--card);border:1.5px solid var(--b1);border-radius:var(--r20);padding:16px;margin:0 16px 12px;box-shadow:var(--shadow);}
+.card-lbl{font-size:11px;font-weight:800;color:var(--t3);letter-spacing:.6px;text-transform:uppercase;margin-bottom:14px;}
+
+/* TX */
+.tx{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1.5px solid var(--bg2);}
+.tx:last-child{border-bottom:none;padding-bottom:0;}
+.tx-ico{width:40px;height:40px;border-radius:var(--r12);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.tx-body{flex:1;min-width:0;}
+.tx-name{font-size:14px;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tx-meta{font-size:11px;color:var(--t3);margin-top:2px;font-weight:600;}
+.tx-right{text-align:right;flex-shrink:0;}
+.tx-amt{font-size:15px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+.tx-amt.pos{color:var(--g2);}
+.tx-amt.neg{color:var(--red);}
+.tx-tag{font-size:9px;padding:2px 7px;border-radius:var(--rpill);margin-top:3px;display:inline-block;font-weight:800;letter-spacing:.3px;}
+.tx-tag.inc{background:#e6faf0;color:var(--g1);}
+.tx-tag.exp{background:var(--redb);color:var(--red);}
+.del-btn{background:none;border:none;cursor:pointer;color:var(--t4);padding:5px;border-radius:var(--r8);font-size:15px;flex-shrink:0;transition:all .12s;}
+.del-btn:active{color:var(--red);background:var(--redb);}
+
+/* CHART */
+.chart-wrap{position:relative;height:120px;margin-top:4px;}
+.chart-legend{display:flex;gap:14px;margin-bottom:8px;}
+.cleg{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--t3);}
+.cleg-dot{width:8px;height:8px;border-radius:2px;}
+
+/* PROGRESS */
+.prog{margin-bottom:14px;}
+.prog:last-child{margin-bottom:0;}
+.prog-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+.prog-cat{font-size:13px;font-weight:700;color:var(--t1);}
+.prog-info{display:flex;align-items:center;gap:7px;}
+.prog-nums{font-size:11px;color:var(--t3);font-weight:600;}
+.prog-x{cursor:pointer;color:var(--t4);font-size:14px;line-height:1;}
+.prog-track{height:8px;background:var(--bg2);border-radius:var(--rpill);overflow:hidden;}
+.prog-fill{height:100%;border-radius:var(--rpill);transition:width .5s cubic-bezier(.34,1.56,.64,1);}
+.prog-note{font-size:10px;font-weight:700;margin-top:4px;}
+
+/* BILLS */
+.bill{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1.5px solid var(--bg2);}
+.bill:last-child{border-bottom:none;}
+.bill-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.bill-body{flex:1;min-width:0;}
+.bill-name{font-size:14px;font-weight:700;color:var(--t1);}
+.bill-due{font-size:11px;color:var(--t3);margin-top:2px;font-weight:600;}
+.bill-right{text-align:right;flex-shrink:0;}
+.bill-amt{font-size:14px;font-weight:700;color:var(--t1);font-family:'JetBrains Mono',monospace;}
+.badge{font-size:10px;padding:3px 10px;border-radius:var(--rpill);cursor:pointer;font-weight:800;margin-top:4px;display:inline-block;border:1.5px solid;transition:all .14s;}
+.badge.paid{background:#e6faf0;color:var(--g1);border-color:#a3e9c1;}
+.badge.due{background:var(--redb);color:var(--red);border-color:#fca5a5;}
+.badge:active{transform:scale(.94);}
+
+/* GOALS */
+.goal{margin-bottom:16px;}
+.goal:last-child{margin-bottom:0;}
+.goal-hd{display:flex;justify-content:space-between;margin-bottom:3px;}
+.goal-name{font-size:14px;font-weight:700;color:var(--t1);}
+.goal-pct{font-size:13px;font-weight:800;color:var(--g2);font-family:'JetBrains Mono',monospace;}
+.goal-sub{font-size:11px;color:var(--t3);font-weight:600;margin-bottom:8px;}
+.goal-del{background:none;border:none;cursor:pointer;color:var(--t4);font-size:11px;font-weight:700;margin-top:6px;font-family:'Nunito',sans-serif;}
+
+/* FORM */
+.form-wrap{padding:0 16px 14px;}
+.form-card{background:var(--card);border:1.5px solid var(--b1);border-radius:var(--r20);padding:20px;box-shadow:var(--shadow);}
+.type-row{display:flex;gap:8px;margin-bottom:16px;}
+.type-btn{flex:1;padding:11px;border-radius:var(--r12);border:1.5px solid var(--b1);background:var(--bg2);color:var(--t3);font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .14s;}
+.type-btn:active{transform:scale(.96);}
+.type-btn.inc.on{background:#e8faf2;border-color:#86efac;color:var(--g1);}
+.type-btn.exp.on{background:#fff0f0;border-color:#fca5a5;color:var(--red);}
+.fg{margin-bottom:13px;}
+.fg label{font-size:10px;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;display:block;margin-bottom:6px;font-weight:800;}
+.fi{width:100%;background:var(--bg2);border:1.5px solid var(--b1);border-radius:var(--r12);padding:12px 14px;color:var(--t1);font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;outline:none;transition:border-color .15s,background .15s;-webkit-appearance:none;appearance:none;}
+.fi:focus{border-color:var(--g3);background:#fff;}
+.fi::placeholder{color:var(--t4);}
+.fi option{background:#fff;color:var(--t1);}
+.f2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.save-btn{width:100%;padding:15px;border-radius:var(--r16);border:none;background:var(--g2);color:#fff;font-size:15px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .15s;margin-top:4px;}
+.save-btn:active{transform:scale(.97);}
+
+/* MONTH STRIP */
+.mstrip{display:flex;gap:8px;padding:0 16px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;}
+.mstrip::-webkit-scrollbar{display:none;}
+.mchip{flex-shrink:0;padding:7px 14px;border-radius:var(--rpill);border:1.5px solid var(--b1);background:var(--card);font-size:12px;font-weight:800;color:var(--t3);cursor:pointer;transition:all .14s;box-shadow:var(--shadow);}
+.mchip.active{background:var(--g2);border-color:var(--g2);color:#fff;}
+
+/* GITHUB SETUP PAGE */
+.setup-hero{margin:0 16px 16px;background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:var(--r24);padding:24px;color:#fff;}
+.setup-hero h2{font-size:20px;font-weight:900;margin-bottom:6px;letter-spacing:-.4px;}
+.setup-hero p{font-size:13px;color:rgba(255,255,255,.6);font-weight:600;line-height:1.55;}
+.step-card{background:var(--card);border:1.5px solid var(--b1);border-radius:var(--r16);padding:16px;margin:0 16px 10px;box-shadow:var(--shadow);display:flex;gap:13px;align-items:flex-start;}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--g2);color:#fff;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.step-body .step-title{font-size:13px;font-weight:800;color:var(--t1);margin-bottom:4px;}
+.step-body .step-desc{font-size:12px;color:var(--t3);font-weight:600;line-height:1.55;}
+.step-body code{background:var(--bg2);border:1px solid var(--b1);border-radius:5px;padding:1px 6px;font-size:11px;color:var(--g1);font-family:'JetBrains Mono',monospace;}
+.gh-form{background:var(--card);border:1.5px solid var(--b1);border-radius:var(--r20);padding:18px;margin:0 16px 14px;box-shadow:var(--shadow);}
+.gh-form h3{font-size:14px;font-weight:800;color:var(--t1);margin-bottom:14px;}
+.gh-status{margin:0 16px 12px;padding:11px 14px;border-radius:var(--r12);font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px;display:none;}
+.gh-status.ok{background:#e6faf0;color:var(--g1);border:1.5px solid #a3e9c1;display:flex;}
+.gh-status.err{background:#fff0f0;color:var(--red);border:1.5px solid #fca5a5;display:flex;}
+.gh-status.info{background:#eff6ff;color:var(--blue);border:1.5px solid #bfdbfe;display:flex;}
+.connect-btn{width:100%;padding:14px;border-radius:var(--r14);border:none;background:#1a1a2e;color:#fff;font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s;}
+.connect-btn:active{opacity:.85;}
+.disconnect-btn{width:100%;padding:11px;border-radius:var(--r14);border:1.5px solid var(--b1);background:transparent;color:var(--red);font-size:13px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:8px;}
+.sync-row{display:flex;gap:8px;margin:0 16px 12px;}
+.sync-row-btn{flex:1;padding:12px;border-radius:var(--r12);border:1.5px solid var(--b1);background:var(--card);color:var(--t2);font-size:13px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:var(--shadow);transition:all .14s;}
+.sync-row-btn:active{transform:scale(.96);}
+.sync-row-btn.primary{background:var(--g2);color:#fff;border-color:var(--g2);}
+
+/* BOTTOM NAV */
+.bnav{background:rgba(240,250,244,.95);backdrop-filter:blur(20px) saturate(1.8);border-top:1.5px solid var(--b1);display:flex;padding:9px 0 calc(9px + env(safe-area-inset-bottom,0px));max-width:430px;margin:0 auto;}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:none;cursor:pointer;color:var(--t4);font-family:'Nunito',sans-serif;transition:color .14s;padding:3px 0;}
+.nb i{font-size:22px;}
+.nb span{font-size:10px;font-weight:800;letter-spacing:.3px;}
+.nb.active{color:var(--g2);}
+.nb-pip{width:4px;height:4px;border-radius:50%;background:var(--g3);margin-top:-1px;opacity:0;transition:opacity .14s;}
+.nb.active .nb-pip{opacity:1;}
+
+/* EMPTY */
+.empty{text-align:center;padding:28px 0;color:var(--t4);}
+.empty i{font-size:30px;display:block;margin-bottom:8px;}
+.empty p{font-size:13px;font-weight:600;}
+
+/* TOAST */
+#toast{position:fixed;bottom:calc(76px + env(safe-area-inset-bottom,0px) + 10px);left:50%;transform:translateX(-50%) translateY(16px);background:var(--g1);color:#fff;font-size:13px;font-weight:800;padding:10px 20px;border-radius:var(--rpill);opacity:0;transition:all .22s;pointer-events:none;z-index:999;white-space:nowrap;max-width:88vw;text-align:center;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+#toast.err{background:var(--red);}
+#toast.info{background:var(--blue);}
+</style>
+</head>
+<body>
+<div id="shell">
+<div id="pages">
+
+<!-- HOME -->
+<div class="page active" id="pg-home">
+  <div class="topbar">
+    <div class="tb-left">
+      <div class="eyebrow" id="greeting">Good morning</div>
+      <div class="headline">My Wallet</div>
+    </div>
+    <div class="tb-right">
+      <div class="ico-btn" id="gh-sync-btn" onclick="ghSync()" title="Sync with GitHub"><i class="ti ti-cloud-upload" id="gh-sync-icon"></i></div>
+    </div>
+  </div>
+  <div class="gh-status" id="home-status"></div>
+  <div class="hero">
+    <div class="hero-lbl">Net balance — <span id="hero-month"></span></div>
+    <div class="hero-amt"><span class="cur">ر.ع.</span><span id="hero-bal">0.000</span></div>
+    <div class="hero-hint" id="hero-hint">Add your first transaction below</div>
+    <div class="hero-chips">
+      <div class="hchip"><div class="hchip-ico"><i class="ti ti-arrow-down"></i></div><div><div class="hchip-lbl">Income</div><div class="hchip-val" id="chip-inc">0.000</div></div></div>
+      <div class="hchip"><div class="hchip-ico"><i class="ti ti-arrow-up"></i></div><div><div class="hchip-lbl">Expenses</div><div class="hchip-val" id="chip-exp">0.000</div></div></div>
+    </div>
+  </div>
+  <div id="insight-box"></div>
+  <div class="sh" style="margin-bottom:12px;"><h2>Quick actions</h2></div>
+  <div class="qa-grid">
+    <div class="qa" onclick="goTo('add')"><div class="qa-ico" style="background:#e8faf2;"><i class="ti ti-plus" style="color:#1a7a42;"></i></div><div><div class="qa-t">Add entry</div><div class="qa-s">Income or expense</div></div></div>
+    <div class="qa" onclick="goTo('budget')"><div class="qa-ico" style="background:#fffbeb;"><i class="ti ti-chart-pie" style="color:#b45309;"></i></div><div><div class="qa-t">Budget</div><div class="qa-s">Spending limits</div></div></div>
+    <div class="qa" onclick="goTo('bills')"><div class="qa-ico" style="background:#f5f3ff;"><i class="ti ti-bell" style="color:#7c3aed;"></i></div><div><div class="qa-t">Bills</div><div class="qa-s">Recurring payments</div></div></div>
+    <div class="qa" onclick="goTo('goals')"><div class="qa-ico" style="background:#eff6ff;"><i class="ti ti-trophy" style="color:#1d4ed8;"></i></div><div><div class="qa-t">Goals</div><div class="qa-s">Savings targets</div></div></div>
+  </div>
+  <div class="sh"><h2>6-month trend</h2></div>
+  <div class="card" style="padding:14px 16px;">
+    <div class="chart-legend"><div class="cleg"><div class="cleg-dot" style="background:#22a058;"></div>Income</div><div class="cleg"><div class="cleg-dot" style="background:#dc2626;"></div>Expenses</div></div>
+    <div class="chart-wrap"><canvas id="spark" role="img" aria-label="6-month income and expenses trend">Income vs expenses over 6 months.</canvas></div>
+  </div>
+  <div class="sh"><h2>Recent</h2><a onclick="goTo('history')">See all</a></div>
+  <div class="card" id="home-tx"></div>
+  <div style="height:8px;"></div>
+</div>
+
+<!-- HISTORY -->
+<div class="page" id="pg-history">
+  <div class="topbar"><div class="tb-left"><div class="eyebrow">All entries</div><div class="headline">History</div></div></div>
+  <div class="mstrip" id="mstrip"></div>
+  <div class="card" id="hist-list"></div>
+  <div style="height:8px;"></div>
+</div>
+
+<!-- ADD -->
+<div class="page" id="pg-add">
+  <div class="topbar"><div class="tb-left"><div class="eyebrow">Log a transaction</div><div class="headline">Add entry</div></div></div>
+  <div class="form-wrap"><div class="form-card">
+    <div class="type-row">
+      <button class="type-btn inc on" id="btn-inc" onclick="setType('income')"><i class="ti ti-arrow-down"></i> Income</button>
+      <button class="type-btn exp" id="btn-exp" onclick="setType('expense')"><i class="ti ti-arrow-up"></i> Expense</button>
+    </div>
+    <div class="fg"><label>Description</label><input class="fi" id="f-desc" type="text" placeholder="e.g. Monthly salary, Groceries..."></div>
+    <div class="f2">
+      <div class="fg"><label>Amount (ر.ع.)</label><input class="fi" id="f-amt" type="number" placeholder="0.000" step="0.001" min="0"></div>
+      <div class="fg"><label>Date</label><input class="fi" id="f-date" type="date"></div>
+    </div>
+    <div class="fg"><label>Category</label><select class="fi" id="f-cat"></select></div>
+    <div class="fg" style="margin-bottom:4px;"><label>Note (optional)</label><input class="fi" id="f-note" type="text" placeholder="Any extra detail..."></div>
+    <button class="save-btn" onclick="addTx()"><i class="ti ti-check"></i> Save transaction</button>
+  </div></div>
+</div>
+
+<!-- BUDGET -->
+<div class="page" id="pg-budget">
+  <div class="topbar"><div class="tb-left"><div class="eyebrow">Monthly limits</div><div class="headline">Budget</div></div></div>
+  <div class="form-wrap"><div class="form-card">
+    <div class="f2">
+      <div class="fg"><label>Category</label><select class="fi" id="b-cat"><option>Food</option><option>Transport</option><option>Shopping</option><option>Utilities</option><option>Health</option><option>Entertainment</option><option>Education</option><option>Rent</option><option>Other</option></select></div>
+      <div class="fg"><label>Limit (ر.ع.)</label><input class="fi" id="b-lim" type="number" placeholder="0.000" step="0.001" min="0"></div>
+    </div>
+    <button class="save-btn" onclick="setBudget()" style="margin-top:0;">Set limit</button>
+  </div></div>
+  <div class="card" id="budget-list"></div>
+  <div style="height:8px;"></div>
+</div>
+
+<!-- BILLS -->
+<div class="page" id="pg-bills">
+  <div class="topbar"><div class="tb-left"><div class="eyebrow">Recurring payments</div><div class="headline">Bills</div></div></div>
+  <div class="form-wrap"><div class="form-card">
+    <div class="fg"><label>Bill name</label><input class="fi" id="bl-name" type="text" placeholder="e.g. Electricity, Netflix..."></div>
+    <div class="f2">
+      <div class="fg"><label>Amount (ر.ع.)</label><input class="fi" id="bl-amt" type="number" placeholder="0.000" step="0.001" min="0"></div>
+      <div class="fg"><label>Due day (1–31)</label><input class="fi" id="bl-day" type="number" placeholder="15" min="1" max="31"></div>
+    </div>
+    <button class="save-btn" onclick="addBill()" style="margin-top:0;">Add bill</button>
+  </div></div>
+  <div class="card" id="bills-list"></div>
+  <div style="height:8px;"></div>
+</div>
+
+<!-- GOALS -->
+<div class="page" id="pg-goals">
+  <div class="topbar"><div class="tb-left"><div class="eyebrow">What you're saving for</div><div class="headline">Goals</div></div></div>
+  <div class="form-wrap"><div class="form-card">
+    <div class="fg"><label>Goal name</label><input class="fi" id="g-name" type="text" placeholder="e.g. Emergency fund, Car..."></div>
+    <div class="f2">
+      <div class="fg"><label>Target (ر.ع.)</label><input class="fi" id="g-target" type="number" placeholder="5000.000" step="0.001" min="0"></div>
+      <div class="fg"><label>Saved so far</label><input class="fi" id="g-saved" type="number" placeholder="0.000" step="0.001" min="0"></div>
+    </div>
+    <button class="save-btn" onclick="addGoal()" style="margin-top:0;">Add goal</button>
+  </div></div>
+  <div class="card" id="goals-list"></div>
+  <div style="height:8px;"></div>
+</div>
+
+<!-- GITHUB SYNC -->
+<div class="page" id="pg-github">
+  <div class="topbar"><div class="tb-left"><div class="eyebrow">Cloud sync</div><div class="headline">GitHub</div></div></div>
+
+  <div id="gh-setup-view">
+    <div class="setup-hero">
+      <h2><i class="ti ti-brand-github" style="font-size:20px;vertical-align:-2px;margin-right:6px;"></i>GitHub sync</h2>
+      <p>Your data is stored in a private GitHub repository and synced automatically. Follow these steps once to connect.</p>
+    </div>
+    <div class="step-card"><div class="step-num">1</div><div class="step-body"><div class="step-title">Create a free GitHub account</div><div class="step-desc">Go to <code>github.com</code> and sign up if you don't have one.</div></div></div>
+    <div class="step-card"><div class="step-num">2</div><div class="step-body"><div class="step-title">Create a new private repository</div><div class="step-desc">Name it <code>malia-finance-data</code> — make sure it's set to <strong>Private</strong>.</div></div></div>
+    <div class="step-card"><div class="step-num">3</div><div class="step-body"><div class="step-title">Create a Personal Access Token</div><div class="step-desc">Go to <code>Settings → Developer settings → Personal access tokens → Tokens (classic)</code> → Generate new token. Select only the <code>repo</code> scope. Copy the token.</div></div></div>
+    <div class="step-card"><div class="step-num">4</div><div class="step-body"><div class="step-title">Enter your details below</div><div class="step-desc">Your token is stored only on this device — never sent anywhere except directly to GitHub's API.</div></div></div>
+
+    <div class="gh-form">
+      <h3><i class="ti ti-plug-connected" style="font-size:15px;vertical-align:-2px;margin-right:5px;color:var(--g2);"></i>Connect your repository</h3>
+      <div class="fg"><label>GitHub username</label><input class="fi" id="gh-user" type="text" placeholder="your-username" autocomplete="off" autocorrect="off" autocapitalize="none"></div>
+      <div class="fg"><label>Repository name</label><input class="fi" id="gh-repo" type="text" placeholder="malia-finance-data" value="malia-finance-data"></div>
+      <div class="fg" style="margin-bottom:4px;"><label>Personal Access Token</label><input class="fi" id="gh-token" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off"></div>
+      <button class="connect-btn" onclick="ghConnect()"><i class="ti ti-brand-github"></i> Connect & sync now</button>
+    </div>
+  </div>
+
+  <div id="gh-connected-view" style="display:none;">
+    <div class="gh-status ok" id="gh-conn-status" style="display:flex;"><i class="ti ti-circle-check" style="font-size:16px;"></i><span id="gh-conn-label">Connected to GitHub</span></div>
+    <div class="sync-row">
+      <button class="sync-row-btn primary" onclick="ghSync()"><i class="ti ti-cloud-upload"></i> Push to GitHub</button>
+      <button class="sync-row-btn" onclick="ghPull()"><i class="ti ti-cloud-download"></i> Pull from GitHub</button>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Sync details</div>
+      <div id="gh-sync-details"></div>
+    </div>
+    <div style="padding:0 16px;"><button class="disconnect-btn" onclick="ghDisconnect()"><i class="ti ti-unlink"></i> Disconnect GitHub</button></div>
+  </div>
+
+  <div style="height:8px;"></div>
+</div>
+
+</div><!-- /pages -->
+
+<nav class="bnav">
+  <button class="nb active" id="nb-home" onclick="goTo('home')"><i class="ti ti-home"></i><span>Home</span><div class="nb-pip"></div></button>
+  <button class="nb" id="nb-history" onclick="goTo('history')"><i class="ti ti-list"></i><span>History</span><div class="nb-pip"></div></button>
+  <button class="nb" id="nb-add" onclick="goTo('add')"><i class="ti ti-circle-plus"></i><span>Add</span><div class="nb-pip"></div></button>
+  <button class="nb" id="nb-budget" onclick="goTo('budget')"><i class="ti ti-chart-pie"></i><span>Budget</span><div class="nb-pip"></div></button>
+  <button class="nb" id="nb-github" onclick="goTo('github')"><i class="ti ti-brand-github"></i><span>Sync</span><div class="nb-pip"></div></button>
+</nav>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── CONSTANTS ──────────────────────────────────────────────────
+const BACKUP_FILE = 'malia-backup.json';
+const catIcons = {Salary:'🏦',Freelance:'💻',Business:'🏢',Food:'🍽',Transport:'🚗',Shopping:'🛍',Utilities:'⚡',Health:'❤️',Entertainment:'🎬',Education:'📚',Rent:'🏠',Other:'📌'};
+const incCats = ['Salary','Freelance','Business','Other'];
+const expCats = ['Food','Transport','Shopping','Utilities','Health','Entertainment','Education','Rent','Other'];
+const ord = d => d+(d===1?'st':d===2?'nd':d===3?'rd':'th');
+const fmt = v => parseFloat(v||0).toFixed(3);
+const now = new Date();
+
+// ── STATE ──────────────────────────────────────────────────────
+let db = {txs:[],budgets:{},bills:[],goals:[]};
+let ghCfg = null; // {user, repo, token}
+let txType = 'income';
+let selMonth = now.getMonth()+'-'+now.getFullYear();
+let sparkChart = null;
+let lastSyncedSha = null;
+
+// ── BOOT ───────────────────────────────────────────────────────
+try { const s=localStorage.getItem('malia_db'); if(s) db=JSON.parse(s); } catch(e){}
+try { const g=localStorage.getItem('malia_gh'); if(g){ ghCfg=JSON.parse(g); refreshGhView(); } } catch(e){}
+
+document.getElementById('greeting').textContent = now.getHours()<12?'Good morning':now.getHours()<17?'Good afternoon':'Good evening';
+document.getElementById('hero-month').textContent = now.toLocaleDateString('en-OM',{month:'long',year:'numeric'});
+document.getElementById('f-date').valueAsDate = now;
+setType('income');
+render();
+
+// Auto-pull on load if connected
+if(ghCfg) setTimeout(()=>ghPull(true), 800);
+
+// Service Worker for PWA
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+// ── NAVIGATION ─────────────────────────────────────────────────
+function goTo(page) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(n=>n.classList.remove('active'));
+  document.getElementById('pg-'+page).classList.add('active');
+  const nb = document.getElementById('nb-'+page);
+  if(nb) nb.classList.add('active');
+  document.getElementById('pages').scrollTop = 0;
+  if(page==='history') buildMonthStrip();
+  if(page==='github') refreshGhView();
+  render();
+}
+
+// ── TYPE TOGGLE ────────────────────────────────────────────────
+function setType(t) {
+  txType = t;
+  document.getElementById('btn-inc').className = 'type-btn inc'+(t==='income'?' on':'');
+  document.getElementById('btn-exp').className = 'type-btn exp'+(t==='expense'?' on':'');
+  document.getElementById('f-cat').innerHTML = (t==='income'?incCats:expCats).map(c=>`<option>${c}</option>`).join('');
+}
+
+// ── CRUD ───────────────────────────────────────────────────────
+function addTx() {
+  const desc=document.getElementById('f-desc').value.trim();
+  const amt=parseFloat(document.getElementById('f-amt').value);
+  const date=document.getElementById('f-date').value;
+  const cat=document.getElementById('f-cat').value;
+  const note=document.getElementById('f-note').value.trim();
+  if(!desc||isNaN(amt)||amt<=0||!date){toast('Fill all required fields','err');return;}
+  db.txs.unshift({id:Date.now(),desc,amount:amt,date,cat,type:txType,note});
+  persist(); render();
+  document.getElementById('f-desc').value='';
+  document.getElementById('f-amt').value='';
+  document.getElementById('f-note').value='';
+  toast('Saved!'); goTo('home');
+  if(ghCfg) scheduleAutoSync();
+}
+function delTx(id){db.txs=db.txs.filter(t=>t.id!==id);persist();render();toast('Deleted');if(ghCfg)scheduleAutoSync();}
+
+function setBudget(){
+  const cat=document.getElementById('b-cat').value;
+  const lim=parseFloat(document.getElementById('b-lim').value);
+  if(isNaN(lim)||lim<=0){toast('Enter a valid limit','err');return;}
+  db.budgets[cat]=lim; persist(); render();
+  document.getElementById('b-lim').value='';
+  toast('Budget set for '+cat);
+  if(ghCfg) scheduleAutoSync();
+}
+function delBudget(cat){delete db.budgets[cat];persist();render();if(ghCfg)scheduleAutoSync();}
+
+function addBill(){
+  const name=document.getElementById('bl-name').value.trim();
+  const amt=parseFloat(document.getElementById('bl-amt').value);
+  const day=parseInt(document.getElementById('bl-day').value);
+  if(!name||isNaN(amt)||isNaN(day)||day<1||day>31){toast('Fill all fields correctly','err');return;}
+  db.bills.push({id:Date.now(),name,amount:amt,day,paid:false});
+  persist();render();
+  document.getElementById('bl-name').value='';document.getElementById('bl-amt').value='';document.getElementById('bl-day').value='';
+  toast('Bill added'); if(ghCfg) scheduleAutoSync();
+}
+function toggleBill(id){const b=db.bills.find(x=>x.id===id);if(b){b.paid=!b.paid;persist();render();if(ghCfg)scheduleAutoSync();}}
+function delBill(id){db.bills=db.bills.filter(x=>x.id!==id);persist();render();}
+
+function addGoal(){
+  const name=document.getElementById('g-name').value.trim();
+  const target=parseFloat(document.getElementById('g-target').value);
+  const saved=parseFloat(document.getElementById('g-saved').value)||0;
+  if(!name||isNaN(target)||target<=0){toast('Fill all fields','err');return;}
+  db.goals.push({id:Date.now(),name,target,saved});persist();render();
+  document.getElementById('g-name').value='';document.getElementById('g-target').value='';document.getElementById('g-saved').value='';
+  toast('Goal added'); if(ghCfg) scheduleAutoSync();
+}
+function delGoal(id){db.goals=db.goals.filter(g=>g.id!==id);persist();render();}
+
+// ── PERSIST ────────────────────────────────────────────────────
+function persist(){try{localStorage.setItem('malia_db',JSON.stringify(db));}catch(e){}}
+
+// ── GITHUB API ─────────────────────────────────────────────────
+const ghHeaders = () => ({
+  'Authorization': `token ${ghCfg.token}`,
+  'Accept': 'application/vnd.github.v3+json',
+  'Content-Type': 'application/json'
+});
+const ghUrl = () => `https://api.github.com/repos/${ghCfg.user}/${ghCfg.repo}/contents/${BACKUP_FILE}`;
+
+async function ghConnect() {
+  const user = document.getElementById('gh-user').value.trim();
+  const repo = document.getElementById('gh-repo').value.trim();
+  const token = document.getElementById('gh-token').value.trim();
+  if(!user||!repo||!token){toast('Fill all fields','err');return;}
+  ghCfg = {user,repo,token};
+  showStatus('Verifying connection...','info');
+  try {
+    const res = await fetch(`https://api.github.com/repos/${user}/${repo}`,{headers:ghHeaders()});
+    if(!res.ok) throw new Error(res.status===404?'Repository not found — check the name':'Auth failed — check your token');
+    localStorage.setItem('malia_gh',JSON.stringify(ghCfg));
+    showStatus('Connected! Pushing your data...','info');
+    await ghPushData();
+    toast('Connected to GitHub!');
+    refreshGhView();
+  } catch(e) {
+    ghCfg = null;
+    showStatus(e.message,'err');
+    toast(e.message,'err');
+  }
+}
+
+async function ghPushData() {
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(db,null,2))));
+  const body = {message:`Malia sync — ${new Date().toISOString()}`,content};
+  if(lastSyncedSha) body.sha = lastSyncedSha;
+  // Try to get current SHA first
+  try {
+    const existing = await fetch(ghUrl(),{headers:ghHeaders()});
+    if(existing.ok){const d=await existing.json();body.sha=d.sha;lastSyncedSha=d.sha;}
+  } catch(e){}
+  const res = await fetch(ghUrl(),{method:'PUT',headers:ghHeaders(),body:JSON.stringify(body)});
+  if(!res.ok){const e=await res.json();throw new Error(e.message||'Push failed');}
+  const d = await res.json();
+  lastSyncedSha = d.content?.sha;
+  localStorage.setItem('malia_last_sync',new Date().toISOString());
+}
+
+async function ghSync() {
+  if(!ghCfg){goTo('github');return;}
+  setSyncBtnState('loading');
+  setHomeStatus('Syncing to GitHub...','info');
+  try {
+    await ghPushData();
+    setSyncBtnState('ok');
+    setHomeStatus('Synced to GitHub · '+new Date().toLocaleTimeString('en-OM',{hour:'2-digit',minute:'2-digit'}),'ok');
+    toast('Synced to GitHub!');
+    setTimeout(()=>setHomeStatus('','')  ,5000);
+    refreshGhView();
+  } catch(e) {
+    setSyncBtnState('err');
+    setHomeStatus('Sync failed: '+e.message,'err');
+    toast('Sync failed','err');
+  }
+  setTimeout(()=>setSyncBtnState('idle'),3000);
+}
+
+async function ghPull(silent=false) {
+  if(!ghCfg) return;
+  if(!silent) setSyncBtnState('loading');
+  try {
+    const res = await fetch(ghUrl(),{headers:ghHeaders()});
+    if(!res.ok){if(res.status===404){if(!silent)toast('No backup found on GitHub yet','info');return;}throw new Error('Pull failed');}
+    const data = await res.json();
+    lastSyncedSha = data.sha;
+    const parsed = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\n/g,'')))));
+    if(parsed.txs||parsed.budgets){
+      db = {txs:parsed.txs||[],budgets:parsed.budgets||{},bills:parsed.bills||[],goals:parsed.goals||[]};
+      persist(); render();
+      if(!silent){toast('Data loaded from GitHub!');setHomeStatus('Loaded from GitHub','ok');setTimeout(()=>setHomeStatus('',''),4000);}
+      refreshGhView();
+    }
+  } catch(e) {
+    if(!silent){toast('Pull failed: '+e.message,'err');}
+  }
+  if(!silent) setTimeout(()=>setSyncBtnState('idle'),2000);
+}
+
+function ghDisconnect(){
+  if(!confirm('Disconnect GitHub? Your local data stays safe.')) return;
+  ghCfg = null; lastSyncedSha = null;
+  localStorage.removeItem('malia_gh');
+  localStorage.removeItem('malia_last_sync');
+  refreshGhView();
+  toast('Disconnected from GitHub');
+}
+
+let autoSyncTimer = null;
+function scheduleAutoSync(){
+  clearTimeout(autoSyncTimer);
+  autoSyncTimer = setTimeout(()=>ghSync(), 4000);
+}
+
+// ── UI HELPERS ─────────────────────────────────────────────────
+function setSyncBtnState(state){
+  const btn=document.getElementById('gh-sync-btn');
+  const ico=document.getElementById('gh-sync-icon');
+  btn.className='ico-btn';
+  if(state==='loading'){ico.className='ti ti-refresh';btn.classList.add('spin');}
+  else if(state==='ok'){ico.className='ti ti-check';btn.classList.add('green');}
+  else if(state==='err'){ico.className='ti ti-alert-circle';btn.classList.add('red-state');}
+  else{ico.className=ghCfg?'ti ti-cloud-upload':'ti ti-brand-github';}
+}
+
+function setHomeStatus(msg,type){
+  const el=document.getElementById('home-status');
+  if(!msg){el.style.display='none';return;}
+  el.className='gh-status '+type;
+  el.innerHTML=`<i class="ti ti-${type==='ok'?'circle-check':type==='err'?'alert-circle':'info-circle'}" style="font-size:15px;"></i>${msg}`;
+  el.style.display='flex';
+}
+
+function showStatus(msg,type){
+  const el=document.getElementById('gh-conn-status');
+  el.className='gh-status '+type;
+  el.innerHTML=`<i class="ti ti-${type==='ok'?'circle-check':type==='err'?'alert-circle':'info-circle'}" style="font-size:15px;"></i>${msg}`;
+  el.style.display='flex';
+}
+
+function refreshGhView(){
+  document.getElementById('gh-setup-view').style.display = ghCfg?'none':'block';
+  document.getElementById('gh-connected-view').style.display = ghCfg?'block':'none';
+  if(ghCfg){
+    const lastSync = localStorage.getItem('malia_last_sync');
+    document.getElementById('gh-conn-label').textContent = `${ghCfg.user}/${ghCfg.repo}`;
+    document.getElementById('gh-sync-details').innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;font-weight:600;color:var(--t2);">Repository</span><span style="font-size:13px;font-weight:700;color:var(--t1);font-family:'JetBrains Mono',monospace;">${ghCfg.user}/${ghCfg.repo}</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;font-weight:600;color:var(--t2);">Last sync</span><span style="font-size:13px;font-weight:700;color:var(--t1);">${lastSync?new Date(lastSync).toLocaleString('en-OM',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'Never'}</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;font-weight:600;color:var(--t2);">Transactions</span><span style="font-size:13px;font-weight:700;color:var(--t1);">${db.txs.length}</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;font-weight:600;color:var(--t2);">File</span><span style="font-size:12px;font-weight:600;color:var(--t3);font-family:'JetBrains Mono',monospace;">${BACKUP_FILE}</span></div>
+      </div>`;
+  }
+  setSyncBtnState('idle');
+}
+
+// ── MONTH STRIP ────────────────────────────────────────────────
+function buildMonthStrip(){
+  const strip=document.getElementById('mstrip');
+  const months=[];
+  for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push({key:d.getMonth()+'-'+d.getFullYear(),lbl:d.toLocaleDateString('en-OM',{month:'short',year:'2-digit'})});}
+  months.push({key:'all',lbl:'All time'});
+  strip.innerHTML=months.map(m=>`<div class="mchip ${m.key===selMonth?'active':''}" onclick="selMonth='${m.key}';buildMonthStrip();render();">${m.lbl}</div>`).join('');
+}
+
+// ── TX HTML ────────────────────────────────────────────────────
+function txHTML(t,del){
+  return `<div class="tx">
+    <div class="tx-ico">${catIcons[t.cat]||'📌'}</div>
+    <div class="tx-body"><div class="tx-name">${t.desc}</div><div class="tx-meta">${t.cat}${t.note?' · '+t.note:''} · ${new Date(t.date).toLocaleDateString('en-OM',{month:'short',day:'numeric'})}</div></div>
+    <div class="tx-right"><div class="tx-amt ${t.type==='income'?'pos':'neg'}">${t.type==='income'?'+':'-'}${fmt(t.amount)}</div><div class="tx-tag ${t.type==='income'?'inc':'exp'}">${t.type==='income'?'IN':'OUT'}</div></div>
+    ${del?`<button class="del-btn" onclick="delTx(${t.id})" aria-label="Delete"><i class="ti ti-trash"></i></button>`:''}
+  </div>`;
+}
+const emptyHTML=(icon,msg)=>`<div class="empty"><i class="ti ${icon}"></i><p>${msg}</p></div>`;
+
+// ── RENDER ─────────────────────────────────────────────────────
+function render(){
+  const m=now.getMonth(),y=now.getFullYear();
+  const mTx=db.txs.filter(t=>{const d=new Date(t.date);return d.getMonth()===m&&d.getFullYear()===y;});
+  const inc=mTx.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const exp=mTx.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const net=inc-exp;
+  document.getElementById('hero-bal').textContent=fmt(net);
+  document.getElementById('chip-inc').textContent=fmt(inc);
+  document.getElementById('chip-exp').textContent=fmt(exp);
+  document.getElementById('hero-hint').textContent=net<0?'Spending more than you earn':inc>0?`Saving ${Math.round((net/inc)*100)}% of income this month`:'Add your first transaction below';
+
+  // Insight
+  const ib=document.getElementById('insight-box');
+  if(db.txs.length>0){
+    if(net<0) ib.innerHTML=`<div class="insight warn"><div class="insight-ico">⚠️</div><div class="insight-txt">You're spending <strong>ر.ع. ${fmt(Math.abs(net))}</strong> more than you earn this month. Review your budget.</div></div>`;
+    else if(inc>0&&Math.round((net/inc)*100)>=15) ib.innerHTML=`<div class="insight"><div class="insight-ico">✨</div><div class="insight-txt">On track — saving <strong>${Math.round((net/inc)*100)}%</strong> of your income this month (ر.ع. ${fmt(net)} surplus).</div></div>`;
+    else ib.innerHTML='';
+  } else ib.innerHTML='';
+
+  // Home TX
+  document.getElementById('home-tx').innerHTML=db.txs.slice(0,5).length?db.txs.slice(0,5).map(t=>txHTML(t,false)).join(''):emptyHTML('ti-receipt','No transactions yet — tap Add to start.');
+
+  // History
+  let hist=db.txs;
+  if(selMonth!=='all'){const[fm,fy]=selMonth.split('-').map(Number);hist=db.txs.filter(t=>{const d=new Date(t.date);return d.getMonth()===fm&&d.getFullYear()===fy;});}
+  document.getElementById('hist-list').innerHTML=hist.length?hist.map(t=>txHTML(t,true)).join(''):emptyHTML('ti-calendar-off','No transactions for this period.');
+
+  // Budget
+  const expByCat={};
+  mTx.filter(t=>t.type==='expense').forEach(t=>{expByCat[t.cat]=(expByCat[t.cat]||0)+t.amount;});
+  const budH=Object.entries(db.budgets).map(([cat,lim])=>{
+    const sp=expByCat[cat]||0,pct=Math.min(Math.round(sp/lim*100),100);
+    const col=pct>90?'#dc2626':pct>70?'#b45309':'#22a058';
+    return `<div class="prog"><div class="prog-hd"><span class="prog-cat">${catIcons[cat]||'📌'} ${cat}</span><span class="prog-info"><span class="prog-nums">ر.ع. ${fmt(sp)} / ${fmt(lim)}</span><span class="prog-x" onclick="delBudget('${cat}')"><i class="ti ti-x"></i></span></span></div><div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${col}"></div></div>${pct>=100?`<div class="prog-note" style="color:#dc2626;">Over by ر.ع. ${fmt(sp-lim)}</div>`:pct>=70?`<div class="prog-note" style="color:#b45309;">${100-pct}% remaining</div>`:''}</div>`;
+  }).join('');
+  document.getElementById('budget-list').innerHTML=budH||emptyHTML('ti-chart-pie','No budgets set.');
+
+  // Bills
+  const today=now.getDate();
+  const blH=db.bills.map(b=>{const dL=b.day>=today?b.day-today:30-(today-b.day);return `<div class="bill"><div class="bill-dot" style="background:${b.paid?'#22a058':'#dc2626'}"></div><div class="bill-body"><div class="bill-name">${b.name}</div><div class="bill-due">Due ${ord(b.day)} · ${b.paid?'Paid this month':'in ~'+dL+' days'}</div></div><div class="bill-right"><div class="bill-amt">ر.ع. ${fmt(b.amount)}</div><span class="badge ${b.paid?'paid':'due'}" onclick="toggleBill(${b.id})">${b.paid?'Paid':'Due'}</span></div><button class="del-btn" onclick="delBill(${b.id})" aria-label="Delete"><i class="ti ti-trash"></i></button></div>`;}).join('');
+  document.getElementById('bills-list').innerHTML=db.bills.length?`<div style="font-size:11px;color:var(--t3);font-weight:700;margin-bottom:12px;">Monthly total: <strong style="color:var(--t1);">ر.ع. ${fmt(db.bills.reduce((s,b)=>s+b.amount,0))}</strong></div>${blH}`:emptyHTML('ti-bell-off','No bills added.');
+
+  // Goals
+  const gH=db.goals.map(g=>{const pct=Math.min(Math.round((g.saved/g.target)*100),100),rem=Math.max(g.target-g.saved,0);return `<div class="goal"><div class="goal-hd"><span class="goal-name">${g.name}</span><span class="goal-pct">${pct}%</span></div><div class="goal-sub">ر.ع. ${fmt(g.saved)} of ر.ع. ${fmt(g.target)} · ر.ع. ${fmt(rem)} to go</div><div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:#22a058"></div></div><button class="goal-del" onclick="delGoal(${g.id})"><i class="ti ti-trash"></i> Remove</button></div>`;}).join('');
+  document.getElementById('goals-list').innerHTML=db.goals.length?gH:emptyHTML('ti-trophy','No goals yet.');
+
+  renderSpark();
+}
+
+function renderSpark(){
+  const canvas=document.getElementById('spark');if(!canvas)return;
+  const months=[];
+  for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);const mm=d.getMonth(),yy=d.getFullYear();const mTx=db.txs.filter(t=>{const td=new Date(t.date);return td.getMonth()===mm&&td.getFullYear()===yy;});months.push({lbl:d.toLocaleDateString('en-OM',{month:'short'}),inc:mTx.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0),exp:mTx.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0)});}
+  if(sparkChart){sparkChart.destroy();sparkChart=null;}
+  sparkChart=new Chart(canvas,{type:'line',data:{labels:months.map(m=>m.lbl),datasets:[{label:'Income',data:months.map(m=>m.inc),borderColor:'#22a058',backgroundColor:'rgba(34,160,88,0.07)',tension:.45,pointRadius:4,pointBackgroundColor:'#22a058',fill:true,borderWidth:2.5},{label:'Expenses',data:months.map(m=>m.exp),borderColor:'#dc2626',backgroundColor:'rgba(220,38,38,0.05)',tension:.45,pointRadius:4,pointBackgroundColor:'#dc2626',fill:true,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'ر.ع. '+fmt(c.raw)}}},scales:{x:{ticks:{color:'#5a9e74',font:{size:10,family:'Nunito',weight:'700'}},grid:{color:'rgba(34,160,88,0.07)'},border:{display:false}},y:{ticks:{color:'#5a9e74',font:{size:10,family:'Nunito',weight:'700'},callback:v=>parseFloat(v).toFixed(0)},grid:{color:'rgba(34,160,88,0.07)'},border:{display:false},beginAtZero:true}}}});
+}
+
+function toast(msg,type){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.className=type==='err'?'err':type==='info'?'info':'';
+  el.classList.add('show');
+  clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2400);
+}
+</script>
+</body>
+</html>
